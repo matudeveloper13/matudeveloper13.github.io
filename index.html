@@ -2,24 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JUST superblocks - Pro Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JUST superblocks - Complete Engine</title>
     <style>
-        /* =========================================
-           GLOBAL RESET & CSS VARIABLES
-           ========================================= */
-        :root {
-            --primary: #ffe600;
-            --primary-glow: rgba(255, 230, 0, 0.5);
-            --secondary: #00ffff;
-            --bg-dark: #0a0a0f;
-            --ui-bg: rgba(15, 15, 25, 0.85);
-            --text-main: #ffffff;
-            --text-muted: #8888aa;
-            --danger: #ff4444;
-            --success: #00ff88;
-            --font-main: 'Arial Black', Gadget, sans-serif;
-            --font-chat: 'Consolas', monospace;
+        /* ==========================================
+           SIMPLE, CLEAN, RETRO UI STYLING
+           ========================================== */
+        * {
+            box-sizing: border-box;
         }
 
         body, html {
@@ -28,299 +18,167 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            font-family: var(--font-main);
-            background-color: var(--bg-dark);
+            background-color: #111111;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
             user-select: none;
-            -webkit-user-select: none;
         }
 
         canvas {
             display: block;
-            width: 100vw;
-            height: 100vh;
             position: absolute;
             top: 0;
             left: 0;
             z-index: 1;
         }
 
-        /* =========================================
-           MAIN MENU OVERLAY
-           ========================================= */
+        /* MAIN MENU CONTAINER */
         #main-menu {
             position: absolute;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: radial-gradient(circle at center, #1a1a2e 0%, var(--bg-dark) 100%);
+            background-color: #222222;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            color: var(--text-main);
-            backdrop-filter: blur(5px);
-            transition: opacity 0.5s ease;
-        }
-
-        .logo-container {
-            text-align: center;
-            margin-bottom: 50px;
-            animation: floatLogo 4s ease-in-out infinite;
-        }
-
-        @keyframes floatLogo {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-15px) scale(1.02); }
-        }
-
-        .logo-container h1 {
-            font-size: 6rem;
-            color: var(--primary);
-            text-shadow: 8px 8px 0px #ff3300, -4px -4px 0px var(--secondary);
-            margin: 0;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        .logo-container p {
-            font-size: 1.5rem;
-            color: var(--secondary);
-            margin-top: 15px;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
         .menu-box {
-            background: var(--ui-bg);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            padding: 50px;
-            border-radius: 20px;
+            background-color: #333333;
+            padding: 40px;
+            border: 3px solid #555555;
             text-align: center;
-            width: 450px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
+            width: 380px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        .menu-box input {
-            width: 90%;
-            padding: 18px;
-            font-size: 1.4rem;
-            font-family: inherit;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            text-align: center;
-            margin-bottom: 10px;
+        h1 {
+            margin: 0 0 25px 0;
+            font-size: 32px;
+            color: #ffffff;
+            letter-spacing: 2px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            margin-bottom: 15px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            color: #000000;
             outline: none;
-            transition: all 0.3s;
-            text-transform: uppercase;
         }
 
-        .menu-box input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
-            transform: scale(1.02);
+        input:focus {
+            border-color: #ff9900;
         }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            margin-bottom: 12px;
+            border: 2px solid #000000;
+            cursor: pointer;
+            color: #000000;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        #btn-obby { background-color: #ff9900; }
+        #btn-void { background-color: #9900ff; color: #ffffff; }
+        #btn-lava { background-color: #cc0000; color: #ffffff; }
 
         #error-msg {
-            color: var(--danger);
-            font-size: 1rem;
-            margin-bottom: 25px;
-            min-height: 24px;
+            color: #ff5555;
+            font-size: 14px;
             font-weight: bold;
-            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+            margin-bottom: 15px;
+            min-height: 20px;
         }
 
-        .game-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .game-btn {
-            padding: 20px;
-            font-size: 1.3rem;
-            font-family: inherit;
-            font-weight: 900;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 6px 0px rgba(0,0,0,0.6);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .game-btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .game-btn:hover::after {
-            left: 100%;
-        }
-
-        .game-btn:hover {
-            transform: translateY(-4px);
-            filter: brightness(1.2);
-        }
-
-        .game-btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0px 0px rgba(0,0,0,0.6);
-        }
-
-        #btn-obby { background: linear-gradient(135deg, #ff6600, #ffcc00); }
-        #btn-void { background: linear-gradient(135deg, #4b0082, #9900ff); }
-        #btn-lava { background: linear-gradient(135deg, #cc0000, #ff3300); }
-
-        /* =========================================
-           HUD & IN-GAME UI
-           ========================================= */
+        /* IN-GAME HUD */
         #hud {
             display: none;
             position: absolute;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 20px;
+            left: 20px;
             z-index: 10;
-            pointer-events: none; /* Let clicks pass through to canvas */
+            pointer-events: none;
         }
 
-        .crosshair {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 20px; height: 20px;
-            transform: translate(-50%, -50%);
-            display: flex; justify-content: center; align-items: center;
+        .interactive-hud {
+            pointer-events: auto;
         }
-        .crosshair::before, .crosshair::after {
-            content: ''; position: absolute; background: rgba(255, 255, 255, 0.8);
-        }
-        .crosshair::before { width: 20px; height: 4px; }
-        .crosshair::after { width: 4px; height: 20px; }
 
-        .stats-panel {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: rgba(0, 0, 0, 0.5);
+        #btn-quit {
+            background-color: #cc0000;
+            color: white;
+            border: 2px solid #000000;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        #btn-quit:hover {
+            background-color: #ff3333;
+        }
+
+        .stats {
+            background-color: rgba(0, 0, 0, 0.75);
             padding: 15px;
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            border: 1px solid rgba(255,255,255,0.2);
-            pointer-events: auto;
-        }
-
-        /* =========================================
-           CHAT SYSTEM UI
-           ========================================= */
-        #chat-container {
-            position: absolute;
-            bottom: 20px; left: 20px;
-            width: 400px;
-            height: 300px;
-            display: flex;
-            flex-direction: column;
-            pointer-events: auto;
-        }
-
-        #chat-messages {
-            flex-grow: 1;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 8px 8px 0 0;
-            padding: 10px;
-            overflow-y: auto;
-            color: white;
-            font-family: var(--font-chat);
+            border: 2px solid #555555;
             font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            text-shadow: 1px 1px 0 #000;
+            line-height: 1.6;
+            width: 220px;
         }
-
-        .chat-line {
-            word-wrap: break-word;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-
-        .chat-author { font-weight: bold; color: var(--primary); }
-        .chat-system { color: var(--secondary); font-style: italic; }
-
-        #chat-input-wrapper {
-            display: flex;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 0 0 8px 8px;
-            padding: 5px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-top: none;
-        }
-
-        #chat-input {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-family: var(--font-chat);
-            font-size: 14px;
-            padding: 8px;
-            outline: none;
-        }
-
-        #chat-input::placeholder { color: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
 
-    <!-- MAIN MENU -->
+    <!-- MAIN MENU SCREEN -->
     <div id="main-menu">
-        <div class="logo-container">
-            <h1>SUPERBLOCKS</h1>
-            <p>Pro Engine Framework</p>
-        </div>
         <div class="menu-box">
-            <input type="text" id="playerName" placeholder="ENTER USERNAME" maxlength="12" autocomplete="off">
+            <h1>SUPERBLOCKS</h1>
+            <input type="text" id="playerName" placeholder="Enter Username..." maxlength="12" autocomplete="off">
             <div id="error-msg"></div>
-            <div class="game-buttons">
-                <button class="game-btn" id="btn-obby">Play Obby</button>
-                <button class="game-btn" id="btn-void">Play Dark Void</button>
-                <button class="game-btn" id="btn-lava">Play Lava Survival</button>
-            </div>
+            <button class="btn" id="btn-obby">Play Obby</button>
+            <button class="btn" id="btn-void">Play Dark Void</button>
+            <button class="btn" id="btn-lava">Play Lava Survival</button>
         </div>
     </div>
 
-    <!-- IN-GAME HUD -->
-    <div id="hud">
-        <div class="crosshair"></div>
-        <div class="stats-panel">
+    <!-- IN-GAME HUD SCREEN -->
+    <div id="hud" class="interactive-hud">
+        <button id="btn-quit">QUIT TO MENU</button>
+        <div class="stats">
             <div id="stat-fps">FPS: 0</div>
-            <div id="stat-ping">Ping: -- ms</div>
-            <div id="stat-pos">Pos: 0, 0, 0</div>
             <div id="stat-mode">Mode: None</div>
-        </div>
-        
-        <!-- CHAT UI -->
-        <div id="chat-container">
-            <div id="chat-messages">
-                <div class="chat-line chat-system">Welcome to SUPERBLOCKS! Press 'Enter' to chat.</div>
-            </div>
-            <div id="chat-input-wrapper">
-                <input type="text" id="chat-input" placeholder="Press Enter to type..." maxlength="64" autocomplete="off">
-            </div>
+            <div id="stat-pos">Pos: 0, 0, 0</div>
         </div>
     </div>
 
-    <!-- ENGINE SCRIPT -->
+    <!-- MAIN ENGINE SCRIPT -->
     <script type="module" src="game.js"></script>
 </body>
 </html>

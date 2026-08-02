@@ -2,1046 +2,325 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SLOPBLOCKS 3D - High-Fidelity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JUST superblocks - Pro Engine</title>
     <style>
-        /* 
-         * ==========================================
-         * CORE STYLES & UI CONFIGURATION
-         * ==========================================
-         */
-        body { 
-            margin: 0; 
+        /* =========================================
+           GLOBAL RESET & CSS VARIABLES
+           ========================================= */
+        :root {
+            --primary: #ffe600;
+            --primary-glow: rgba(255, 230, 0, 0.5);
+            --secondary: #00ffff;
+            --bg-dark: #0a0a0f;
+            --ui-bg: rgba(15, 15, 25, 0.85);
+            --text-main: #ffffff;
+            --text-muted: #8888aa;
+            --danger: #ff4444;
+            --success: #00ff88;
+            --font-main: 'Arial Black', Gadget, sans-serif;
+            --font-chat: 'Consolas', monospace;
+        }
+
+        body, html {
+            margin: 0;
             padding: 0;
-            overflow: hidden; 
-            background-color: #222; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
             user-select: none;
             -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
         }
 
-        /* 
-         * Main UI Overlay
-         * Positioned at the top left to guide the player
-         * Pointer-events disabled so it doesn't block right-clicks
-         */
-        #ui {
-            position: absolute; 
-            top: 15px; 
-            left: 15px;
-            color: #ffffff; 
-            z-index: 10; 
-            pointer-events: none;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px 25px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(4px);
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
-        #ui h1 {
-            margin: 0 0 10px 0; 
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            color: #fbd25a;
+        /* =========================================
+           MAIN MENU OVERLAY
+           ========================================= */
+        #main-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #1a1a2e 0%, var(--bg-dark) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: var(--text-main);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.5s ease;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: floatLogo 4s ease-in-out infinite;
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.02); }
+        }
+
+        .logo-container h1 {
+            font-size: 6rem;
+            color: var(--primary);
+            text-shadow: 8px 8px 0px #ff3300, -4px -4px 0px var(--secondary);
+            margin: 0;
+            letter-spacing: 4px;
             text-transform: uppercase;
         }
 
-        #ui p {
-            margin: 8px 0;
-            font-size: 16px;
-            line-height: 1.4;
-            color: #e0e0e0;
+        .logo-container p {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin-top: 15px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
-        #ui b {
-            color: #ffffff;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 14px;
+        .menu-box {
+            background: var(--ui-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            width: 450px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
         }
 
-        /* Loading Screen (Hidden by default, ready for future expansion) */
-        #loading-screen {
+        .menu-box input {
+            width: 90%;
+            padding: 18px;
+            font-size: 1.4rem;
+            font-family: inherit;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            outline: none;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .menu-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: scale(1.02);
+        }
+
+        #error-msg {
+            color: var(--danger);
+            font-size: 1rem;
+            margin-bottom: 25px;
+            min-height: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+        }
+
+        .game-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .game-btn {
+            padding: 20px;
+            font-size: 1.3rem;
+            font-family: inherit;
+            font-weight: 900;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .game-btn:hover::after {
+            left: 100%;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-4px);
+            filter: brightness(1.2);
+        }
+
+        .game-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.6);
+        }
+
+        #btn-obby { background: linear-gradient(135deg, #ff6600, #ffcc00); }
+        #btn-void { background: linear-gradient(135deg, #4b0082, #9900ff); }
+        #btn-lava { background: linear-gradient(135deg, #cc0000, #ff3300); }
+
+        /* =========================================
+           HUD & IN-GAME UI
+           ========================================= */
+        #hud {
             display: none;
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #111;
-            z-index: 999;
-            color: white;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass through to canvas */
         }
+
+        .crosshair {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 20px; height: 20px;
+            transform: translate(-50%, -50%);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .crosshair::before, .crosshair::after {
+            content: ''; position: absolute; background: rgba(255, 255, 255, 0.8);
+        }
+        .crosshair::before { width: 20px; height: 4px; }
+        .crosshair::after { width: 4px; height: 20px; }
+
+        .stats-panel {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            pointer-events: auto;
+        }
+
+        /* =========================================
+           CHAT SYSTEM UI
+           ========================================= */
+        #chat-container {
+            position: absolute;
+            bottom: 20px; left: 20px;
+            width: 400px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            pointer-events: auto;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px 8px 0 0;
+            padding: 10px;
+            overflow-y: auto;
+            color: white;
+            font-family: var(--font-chat);
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .chat-line {
+            word-wrap: break-word;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .chat-author { font-weight: bold; color: var(--primary); }
+        .chat-system { color: var(--secondary); font-style: italic; }
+
+        #chat-input-wrapper {
+            display: flex;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 0 0 8px 8px;
+            padding: 5px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-top: none;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: var(--font-chat);
+            font-size: 14px;
+            padding: 8px;
+            outline: none;
+        }
+
+        #chat-input::placeholder { color: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
 
-    <!-- User Interface Layer -->
-    <div id="ui">
-        <h1>SLOPBLOCKS</h1>
-        <p>Hold <b>Right-Click</b> to look around</p>
-        <p><b>W</b> <b>A</b> <b>S</b> <b>D</b> to move</p>
-        <p><b>SPACE</b> to jump</p>
+    <!-- MAIN MENU -->
+    <div id="main-menu">
+        <div class="logo-container">
+            <h1>SUPERBLOCKS</h1>
+            <p>Pro Engine Framework</p>
+        </div>
+        <div class="menu-box">
+            <input type="text" id="playerName" placeholder="ENTER USERNAME" maxlength="12" autocomplete="off">
+            <div id="error-msg"></div>
+            <div class="game-buttons">
+                <button class="game-btn" id="btn-obby">Play Obby</button>
+                <button class="game-btn" id="btn-void">Play Dark Void</button>
+                <button class="game-btn" id="btn-lava">Play Lava Survival</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Reliable, stable versions of our libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+    <!-- IN-GAME HUD -->
+    <div id="hud">
+        <div class="crosshair"></div>
+        <div class="stats-panel">
+            <div id="stat-fps">FPS: 0</div>
+            <div id="stat-ping">Ping: -- ms</div>
+            <div id="stat-pos">Pos: 0, 0, 0</div>
+            <div id="stat-mode">Mode: None</div>
+        </div>
+        
+        <!-- CHAT UI -->
+        <div id="chat-container">
+            <div id="chat-messages">
+                <div class="chat-line chat-system">Welcome to SUPERBLOCKS! Press 'Enter' to chat.</div>
+            </div>
+            <div id="chat-input-wrapper">
+                <input type="text" id="chat-input" placeholder="Press Enter to type..." maxlength="64" autocomplete="off">
+            </div>
+        </div>
+    </div>
 
-    <script>
-        /**
-         * ============================================================================
-         * PRE-CALCULATED LEVEL DATA
-         * ============================================================================
-         * To ensure a rich, dense environment, we bypass the random 15 obstacle loop
-         * and define a massive, deterministic level map. 
-         * Each entry represents an obstacle's X, Z, Size (s), and Color (c).
-         */
-        const levelMapData = [
-            { x: 5.1, z: 5.2, s: 1.0, c: 0xe74c3c },
-            { x: -5.3, z: 15.1, s: 1.5, c: 0x8e44ad },
-            { x: 15.0, z: -10.5, s: 2.0, c: 0x3498db },
-            { x: -15.2, z: -25.0, s: 1.2, c: 0xf1c40f },
-            { x: 25.1, z: 10.3, s: 0.8, c: 0x2ecc71 },
-            { x: 8.4, z: -30.2, s: 1.7, c: 0xe67e22 },
-            { x: -20.5, z: 20.0, s: 2.1, c: 0x1abc9c },
-            { x: 30.2, z: -5.4, s: 1.4, c: 0x9b59b6 },
-            { x: -35.1, z: 5.5, s: 1.1, c: 0x34495e },
-            { x: 2.3, z: 35.1, s: 1.9, c: 0x95a5a6 },
-            { x: 12.1, z: 12.2, s: 1.3, c: 0xe74c3c },
-            { x: -12.3, z: 25.1, s: 1.6, c: 0x8e44ad },
-            { x: 25.0, z: -20.5, s: 2.2, c: 0x3498db },
-            { x: -25.2, z: -35.0, s: 1.4, c: 0xf1c40f },
-            { x: 35.1, z: 20.3, s: 0.9, c: 0x2ecc71 },
-            { x: 18.4, z: -40.2, s: 1.8, c: 0xe67e22 },
-            { x: -30.5, z: 30.0, s: 2.3, c: 0x1abc9c },
-            { x: 40.2, z: -15.4, s: 1.5, c: 0x9b59b6 },
-            { x: -45.1, z: 15.5, s: 1.2, c: 0x34495e },
-            { x: 12.3, z: 45.1, s: 2.0, c: 0x95a5a6 },
-            { x: 7.1, z: 7.2, s: 1.0, c: 0xe74c3c },
-            { x: -7.3, z: 17.1, s: 1.5, c: 0x8e44ad },
-            { x: 17.0, z: -12.5, s: 2.0, c: 0x3498db },
-            { x: -17.2, z: -27.0, s: 1.2, c: 0xf1c40f },
-            { x: 27.1, z: 12.3, s: 0.8, c: 0x2ecc71 },
-            { x: 10.4, z: -32.2, s: 1.7, c: 0xe67e22 },
-            { x: -22.5, z: 22.0, s: 2.1, c: 0x1abc9c },
-            { x: 32.2, z: -7.4, s: 1.4, c: 0x9b59b6 },
-            { x: -37.1, z: 7.5, s: 1.1, c: 0x34495e },
-            { x: 4.3, z: 37.1, s: 1.9, c: 0x95a5a6 },
-            { x: 14.1, z: 14.2, s: 1.3, c: 0xe74c3c },
-            { x: -14.3, z: 27.1, s: 1.6, c: 0x8e44ad },
-            { x: 27.0, z: -22.5, s: 2.2, c: 0x3498db },
-            { x: -27.2, z: -37.0, s: 1.4, c: 0xf1c40f },
-            { x: 37.1, z: 22.3, s: 0.9, c: 0x2ecc71 },
-            { x: 20.4, z: -42.2, s: 1.8, c: 0xe67e22 },
-            { x: -32.5, z: 32.0, s: 2.3, c: 0x1abc9c },
-            { x: 42.2, z: -17.4, s: 1.5, c: 0x9b59b6 },
-            { x: -47.1, z: 17.5, s: 1.2, c: 0x34495e },
-            { x: 14.3, z: 47.1, s: 2.0, c: 0x95a5a6 },
-            { x: 9.1, z: 9.2, s: 1.0, c: 0xe74c3c },
-            { x: -9.3, z: 19.1, s: 1.5, c: 0x8e44ad },
-            { x: 19.0, z: -14.5, s: 2.0, c: 0x3498db },
-            { x: -19.2, z: -29.0, s: 1.2, c: 0xf1c40f },
-            { x: 29.1, z: 14.3, s: 0.8, c: 0x2ecc71 },
-            { x: 12.4, z: -34.2, s: 1.7, c: 0xe67e22 },
-            { x: -24.5, z: 24.0, s: 2.1, c: 0x1abc9c },
-            { x: 34.2, z: -9.4, s: 1.4, c: 0x9b59b6 },
-            { x: -39.1, z: 9.5, s: 1.1, c: 0x34495e },
-            { x: 6.3, z: 39.1, s: 1.9, c: 0x95a5a6 },
-            { x: 16.1, z: 16.2, s: 1.3, c: 0xe74c3c },
-            { x: -16.3, z: 29.1, s: 1.6, c: 0x8e44ad },
-            { x: 29.0, z: -24.5, s: 2.2, c: 0x3498db },
-            { x: -29.2, z: -39.0, s: 1.4, c: 0xf1c40f },
-            { x: 39.1, z: 24.3, s: 0.9, c: 0x2ecc71 },
-            { x: 22.4, z: -44.2, s: 1.8, c: 0xe67e22 },
-            { x: -34.5, z: 34.0, s: 2.3, c: 0x1abc9c },
-            { x: 44.2, z: -19.4, s: 1.5, c: 0x9b59b6 },
-            { x: -49.1, z: 19.5, s: 1.2, c: 0x34495e },
-            { x: 16.3, z: 49.1, s: 2.0, c: 0x95a5a6 },
-            { x: 11.1, z: 11.2, s: 1.0, c: 0xe74c3c },
-            { x: -11.3, z: 21.1, s: 1.5, c: 0x8e44ad },
-            { x: 21.0, z: -16.5, s: 2.0, c: 0x3498db },
-            { x: -21.2, z: -31.0, s: 1.2, c: 0xf1c40f },
-            { x: 31.1, z: 16.3, s: 0.8, c: 0x2ecc71 },
-            { x: 14.4, z: -36.2, s: 1.7, c: 0xe67e22 },
-            { x: -26.5, z: 26.0, s: 2.1, c: 0x1abc9c },
-            { x: 36.2, z: -11.4, s: 1.4, c: 0x9b59b6 },
-            { x: -41.1, z: 11.5, s: 1.1, c: 0x34495e },
-            { x: 8.3, z: 41.1, s: 1.9, c: 0x95a5a6 },
-            { x: 18.1, z: 18.2, s: 1.3, c: 0xe74c3c },
-            { x: -18.3, z: 31.1, s: 1.6, c: 0x8e44ad },
-            { x: 31.0, z: -26.5, s: 2.2, c: 0x3498db },
-            { x: -31.2, z: -41.0, s: 1.4, c: 0xf1c40f },
-            { x: 41.1, z: 26.3, s: 0.9, c: 0x2ecc71 },
-            { x: 24.4, z: -46.2, s: 1.8, c: 0xe67e22 },
-            { x: -36.5, z: 36.0, s: 2.3, c: 0x1abc9c },
-            { x: 46.2, z: -21.4, s: 1.5, c: 0x9b59b6 },
-            { x: -51.1, z: 21.5, s: 1.2, c: 0x34495e },
-            { x: 18.3, z: 51.1, s: 2.0, c: 0x95a5a6 },
-            { x: -3.1, z: -3.2, s: 1.0, c: 0xe74c3c },
-            { x: 3.3, z: -13.1, s: 1.5, c: 0x8e44ad },
-            { x: -13.0, z: 12.5, s: 2.0, c: 0x3498db },
-            { x: 13.2, z: 27.0, s: 1.2, c: 0xf1c40f },
-            { x: -23.1, z: -12.3, s: 0.8, c: 0x2ecc71 },
-            { x: -10.4, z: 34.2, s: 1.7, c: 0xe67e22 },
-            { x: 24.5, z: -24.0, s: 2.1, c: 0x1abc9c },
-            { x: -34.2, z: 9.4, s: 1.4, c: 0x9b59b6 },
-            { x: 39.1, z: -9.5, s: 1.1, c: 0x34495e },
-            { x: -6.3, z: -39.1, s: 1.9, c: 0x95a5a6 },
-            { x: 1.1, z: 2.2, s: 1.3, c: 0xe74c3c },
-            { x: -2.3, z: 4.1, s: 1.6, c: 0x8e44ad },
-            { x: 4.0, z: -3.5, s: 2.2, c: 0x3498db },
-            { x: -6.2, z: -8.0, s: 1.4, c: 0xf1c40f },
-            { x: 8.1, z: 6.3, s: 0.9, c: 0x2ecc71 },
-            { x: 5.4, z: -10.2, s: 1.8, c: 0xe67e22 },
-            { x: -8.5, z: 8.0, s: 2.3, c: 0x1abc9c },
-            { x: 10.2, z: -4.4, s: 1.5, c: 0x9b59b6 },
-            { x: -12.1, z: 6.5, s: 1.2, c: 0x34495e },
-            { x: 3.3, z: 15.1, s: 2.0, c: 0x95a5a6 },
-            { x: 22.1, z: -22.2, s: 1.0, c: 0xe74c3c },
-            { x: -22.3, z: -12.1, s: 1.5, c: 0x8e44ad },
-            { x: -12.0, z: 22.5, s: 2.0, c: 0x3498db },
-            { x: 22.2, z: 37.0, s: 1.2, c: 0xf1c40f },
-            { x: -33.1, z: -22.3, s: 0.8, c: 0x2ecc71 },
-            { x: -20.4, z: 44.2, s: 1.7, c: 0xe67e22 },
-            { x: 34.5, z: -34.0, s: 2.1, c: 0x1abc9c },
-            { x: -44.2, z: 19.4, s: 1.4, c: 0x9b59b6 },
-            { x: 49.1, z: -19.5, s: 1.1, c: 0x34495e },
-            { x: -16.3, z: -49.1, s: 1.9, c: 0x95a5a6 },
-            { x: 11.1, z: 12.2, s: 1.3, c: 0xe74c3c },
-            { x: -12.3, z: 14.1, s: 1.6, c: 0x8e44ad },
-            { x: 14.0, z: -13.5, s: 2.2, c: 0x3498db },
-            { x: -16.2, z: -18.0, s: 1.4, c: 0xf1c40f },
-            { x: 18.1, z: 16.3, s: 0.9, c: 0x2ecc71 },
-            { x: 15.4, z: -20.2, s: 1.8, c: 0xe67e22 },
-            { x: -18.5, z: 18.0, s: 2.3, c: 0x1abc9c },
-            { x: 20.2, z: -14.4, s: 1.5, c: 0x9b59b6 },
-            { x: -22.1, z: 16.5, s: 1.2, c: 0x34495e },
-            { x: 13.3, z: 25.1, s: 2.0, c: 0x95a5a6 },
-        ];
-
-        /**
-         * ============================================================================
-         * CUSTOM GEOMETRY FUNCTION: ROUNDED BOX
-         * ============================================================================
-         * This function manually computes the vertices and faces required to render
-         * a box with smoothed out, rounded corners, providing a high-fidelity 
-         * visual aesthetic.
-         */
-        THREE.RoundedBoxGeometry = function( width, height, depth, radius, radiusSegments ) {
-            
-            // Initialize base Geometry class
-            THREE.Geometry.call( this );
-            
-            // Identify geometry type for Three.js internals
-            this.type = 'RoundedBoxGeometry';
-            
-            // Assign default parameters if missing
-            if ( radiusSegments === undefined ) {
-                radiusSegments = 8;
-            }
-            if ( radius === undefined ) {
-                radius = 0.05;
-            }
-            
-            // Ensure radius doesn't exceed half the size of the smallest dimension
-            var maxRadius = Math.min( width * 0.5, height * 0.5, depth * 0.5 );
-            if ( radius > maxRadius ) {
-                radius = maxRadius;
-            }
-            
-            // Counter for tracking vertex indices during generation
-            var vertexCount = 0;
-            
-            // Helper to add a vertex and return its index
-            var addVertex = ( x, y, z, u, v ) => {
-                var vector = new THREE.Vector3( x, y, z );
-                this.vertices.push( vector );
-                var currentVertexIndex = vertexCount;
-                vertexCount = vertexCount + 1;
-                return currentVertexIndex;
-            };
-
-            // Helper to generate a face and assign UV coordinates
-            var createFace = ( a, b, c, uva, uvb, uvc ) => {
-                var face = new THREE.Face3( a, b, c );
-                this.faces.push( face );
-                var uvArray = [ uva, uvb, uvc ];
-                this.faceVertexUvs[0].push( uvArray );
-            };
-
-            // Calculate internal vertex boundaries for corner spherical interpolation
-            var getCornerVertex = ( x, y, z ) => {
-                var v = new THREE.Vector3();
-                
-                var xBound;
-                if ( x < 0 ) {
-                    xBound = - ( width * 0.5 - radius );
-                } else {
-                    xBound = ( width * 0.5 - radius );
-                }
-                
-                var yBound;
-                if ( y < 0 ) {
-                    yBound = - ( height * 0.5 - radius );
-                } else {
-                    yBound = ( height * 0.5 - radius );
-                }
-                
-                var zBound;
-                if ( z < 0 ) {
-                    zBound = - ( depth * 0.5 - radius );
-                } else {
-                    zBound = ( depth * 0.5 - radius );
-                }
-                
-                v.set( xBound, yBound, zBound );
-                return v;
-            };
-
-            // To achieve the visual requirement, we use a subdivided BoxGeometry 
-            // and shift its vertices mathematically towards the corner constraints.
-            
-            // Define segment resolution based on requested radius segments
-            var widthSegments = radiusSegments * 2;
-            var heightSegments = radiusSegments * 2;
-            var depthSegments = radiusSegments * 2;
-            
-            // Generate standard box
-            var boxGeo = new THREE.BoxGeometry(
-                width, 
-                height, 
-                depth, 
-                widthSegments, 
-                heightSegments, 
-                depthSegments
-            );
-            
-            // Copy geometry over to this instance
-            THREE.Geometry.prototype.copy.call(this, boxGeo);
-            
-            // Perform spherical shifting on outer vertices
-            var pos = new THREE.Vector3();
-            var corner = new THREE.Vector3();
-            
-            // Iterate through every vertex generated by BoxGeometry
-            for (var i = 0; i < this.vertices.length; i++) {
-                
-                // Copy current vertex position
-                pos.copy(this.vertices[i]);
-                
-                // Calculate which bounding box corner this vertex belongs to
-                var cornerX;
-                if ( pos.x < 0 ) {
-                    cornerX = - ( width * 0.5 - radius );
-                } else {
-                    cornerX = ( width * 0.5 - radius );
-                }
-                
-                var cornerY;
-                if ( pos.y < 0 ) {
-                    cornerY = - ( height * 0.5 - radius );
-                } else {
-                    cornerY = ( height * 0.5 - radius );
-                }
-                
-                var cornerZ;
-                if ( pos.z < 0 ) {
-                    cornerZ = - ( depth * 0.5 - radius );
-                } else {
-                    cornerZ = ( depth * 0.5 - radius );
-                }
-                
-                corner.set( cornerX, cornerY, cornerZ );
-                
-                // Perform the spherical projection to round the corner
-                pos.sub(corner);
-                pos.normalize();
-                pos.multiplyScalar(radius);
-                pos.add(corner);
-                
-                // Apply the calculated rounded position
-                this.vertices[i].copy(pos);
-            }
-            
-            // Cleanup and finalize geometry calculations
-            this.mergeVertices();
-            this.computeFaceNormals();
-            this.computeVertexNormals();
-        }
-        
-        // Inherit prototype chain
-        THREE.RoundedBoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
-        THREE.RoundedBoxGeometry.prototype.constructor = THREE.RoundedBoxGeometry;
-        
-        /**
-         * ============================================================================
-         * 1. SETUP SCENE, CAMERA, RENDERER
-         * ============================================================================
-         */
-        
-        // Initialize Core Scene
-        const scene = new THREE.Scene();
-        
-        // Define Atmosphere / Sky Color
-        const skyColor = new THREE.Color(0x56a0d3);
-        scene.background = skyColor;
-        
-        // Setup Depth Fog to blend objects into the horizon smoothly
-        const fogColor = new THREE.Color(0x56a0d3);
-        const fogNear = 10;
-        const fogFar = 80;
-        scene.fog = new THREE.Fog(fogColor, fogNear, fogFar);
-
-        // Initialize Camera Settings
-        const fieldOfView = 70;
-        const aspectRatio = window.innerWidth / window.innerHeight;
-        const nearClipping = 0.1;
-        const farClipping = 1000;
-        
-        const camera = new THREE.PerspectiveCamera(
-            fieldOfView, 
-            aspectRatio, 
-            nearClipping, 
-            farClipping
-        );
-        
-        // Initialize WebGL Renderer
-        const rendererParameters = { 
-            antialias: true 
-        };
-        const renderer = new THREE.WebGLRenderer(rendererParameters);
-        
-        // Configure Renderer Output
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // High quality soft shadows
-        
-        // Append rendering canvas to document body
-        document.body.appendChild(renderer.domElement);
-
-        /**
-         * ============================================================================
-         * 2. SETUP PHYSICS WORLD (CANNON.JS)
-         * ============================================================================
-         */
-        
-        // Initialize Physics Simulation World
-        const world = new CANNON.World();
-        
-        // Apply Heavy Gravity to match desired snappy aesthetic
-        world.gravity.set(0, -80, 0); 
-        
-        // Setup Broadphase Collision Detection
-        world.broadphase = new CANNON.NaiveBroadphase();
-        
-        // Increase solver iterations for better stability
-        world.solver.iterations = 10;
-
-        // Define Physical Materials
-        const groundMaterial = new CANNON.Material("ground");
-        const playerMaterial = new CANNON.Material("player");
-        
-        // Define Contact Behavior between Player and Ground
-        const contactMaterialOptions = {
-            friction: 0.8, // High friction causes snappy stopping when input is released
-            restitution: 0 // Zero restitution prevents bouncy behavior
-        };
-        
-        const contactMaterial = new CANNON.ContactMaterial(
-            groundMaterial, 
-            playerMaterial, 
-            contactMaterialOptions
-        );
-        
-        // Register contact material to simulation
-        world.addContactMaterial(contactMaterial);
-
-        /**
-         * ============================================================================
-         * 3. LIGHTING SETUP
-         * ============================================================================
-         */
-        
-        // Base Ambient Lighting
-        const ambientColor = 0xffffff;
-        const ambientIntensity = 0.5;
-        const ambientLight = new THREE.AmbientLight(ambientColor, ambientIntensity);
-        scene.add(ambientLight);
-
-        // Main Directional Sun Light
-        const dirLightColor = 0xffffff;
-        const dirLightIntensity = 0.9;
-        const dirLight = new THREE.DirectionalLight(dirLightColor, dirLightIntensity);
-        
-        // Position Sun
-        dirLight.position.set(20, 40, 20);
-        
-        // Enable Shadow Casting
-        dirLight.castShadow = true;
-        
-        // Configure Shadow Map Resolution
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
-        
-        // Configure Shadow Frustum Bounds
-        const shadowFrustumSize = 50;
-        dirLight.shadow.camera.left = -shadowFrustumSize;
-        dirLight.shadow.camera.right = shadowFrustumSize;
-        dirLight.shadow.camera.top = shadowFrustumSize;
-        dirLight.shadow.camera.bottom = -shadowFrustumSize;
-        
-        scene.add(dirLight);
-
-        /**
-         * ============================================================================
-         * 4. ENVIRONMENT GENERATION
-         * ============================================================================
-         */
-        
-        // Generate Ground Plane Geometry
-        const groundWidth = 200;
-        const groundLength = 200;
-        const groundGeo = new THREE.PlaneGeometry(groundWidth, groundLength);
-        
-        // Define Ground Material Setup
-        const groundColor = 0x4aa050;
-        const groundMatOptions = { 
-            color: groundColor,
-            roughness: 0.8,
-            metalness: 0.1
-        };
-        const groundMat = new THREE.MeshStandardMaterial(groundMatOptions);
-        
-        // Construct Ground Mesh
-        const groundMesh = new THREE.Mesh(groundGeo, groundMat);
-        
-        // Rotate Plane to face upwards on Y-axis
-        groundMesh.rotation.x = -Math.PI / 2;
-        
-        // Ensure ground receives shadows
-        groundMesh.receiveShadow = true;
-        scene.add(groundMesh);
-
-        // Generate Physics Ground Body
-        const groundBodyOptions = { 
-            mass: 0, // 0 mass makes it static/immovable
-            shape: new CANNON.Plane(), 
-            material: groundMaterial 
-        };
-        const groundBody = new CANNON.Body(groundBodyOptions);
-        
-        // Align Physics Plane with Rendering Plane
-        const groundRotationAxis = new CANNON.Vec3(1, 0, 0);
-        const groundRotationAngle = -Math.PI / 2;
-        groundBody.quaternion.setFromAxisAngle(groundRotationAxis, groundRotationAngle);
-        
-        world.addBody(groundBody);
-
-        // Populate World with Pre-calculated Obstacles
-        for ( let i = 0; i < levelMapData.length; i++ ) {
-            const data = levelMapData[i];
-            
-            // Construct Render Geometry
-            const obsGeo = new THREE.BoxGeometry(data.s, data.s, data.s);
-            
-            // Construct Render Material
-            const obsMat = new THREE.MeshStandardMaterial({ color: data.c });
-            
-            // Construct Mesh
-            const obsMesh = new THREE.Mesh(obsGeo, obsMat);
-            
-            // Enable Shadows
-            obsMesh.castShadow = true; 
-            obsMesh.receiveShadow = true;
-            
-            // Calculate Elevation (sit flush on ground)
-            const elevationY = data.s / 2;
-            
-            // Set Position
-            obsMesh.position.set(data.x, elevationY, data.z);
-            scene.add(obsMesh);
-            
-            // Construct Physics Hitbox (Cannon uses half-extents for boxes)
-            const halfExtents = new CANNON.Vec3(data.s / 2, data.s / 2, data.s / 2);
-            const obsShape = new CANNON.Box(halfExtents);
-            
-            // Construct Physics Body
-            const obsBodyOpts = {
-                mass: 0,
-                shape: obsShape,
-                position: new CANNON.Vec3(data.x, elevationY, data.z),
-                material: groundMaterial
-            };
-            
-            const obsBody = new CANNON.Body(obsBodyOpts);
-            world.addBody(obsBody);
-        }
-
-        /**
-         * ============================================================================
-         * 5. CREATE HIGH-FIDELITY AVATAR
-         * ============================================================================
-         */
-        
-        // Initialize Main Avatar Group Container
-        const avatarGroup = new THREE.Group();
-        scene.add(avatarGroup);
-
-        // Procedurally Generate Face Texture using HTML Canvas API
-        const faceCanvas = document.createElement('canvas');
-        faceCanvas.width = 128; 
-        faceCanvas.height = 128;
-        
-        const faceCtx = faceCanvas.getContext('2d');
-        
-        // Base Skin Color Fill
-        faceCtx.fillStyle = '#fbd25a'; 
-        faceCtx.fillRect(0, 0, 128, 128);
-        
-        // Eye Color Fill
-        faceCtx.fillStyle = 'black';
-        
-        // Draw Left Eye
-        faceCtx.fillRect(32, 40, 12, 16);
-        
-        // Draw Right Eye
-        faceCtx.fillRect(84, 40, 12, 16);
-        
-        // Draw Smile Arc
-        faceCtx.beginPath(); 
-        faceCtx.arc(64, 80, 20, 0, Math.PI, false); 
-        faceCtx.lineWidth = 6; 
-        faceCtx.stroke();
-        
-        // Convert Canvas to Three.js Texture
-        const faceTexture = new THREE.CanvasTexture(faceCanvas);
-
-        // Define Character Materials
-        const skinMat = new THREE.MeshStandardMaterial({ color: 0xfbd25a });
-        const shirtMat = new THREE.MeshStandardMaterial({ color: 0x1e88e5 }); 
-        const pantsMat = new THREE.MeshStandardMaterial({ color: 0x43a047 }); 
-
-        // Map Face Texture to Face Material
-        const faceMat = new THREE.MeshStandardMaterial({ map: faceTexture });
-
-        // Define Avatar Anatomical Proportions
-        const torsoW = 1.0;
-        const torsoH = 1.0;
-        const torsoD = 0.5;
-        const headSize = 0.6;
-        const limbSize = 0.5;
-        const limbLength = 1.0; 
-        
-        // Define Rounding Fidelity
-        const edgeRadius = 0.1; 
-        const edgeSegments = 8;
-
-        // Build Head Geometry
-        const headGeo = new THREE.RoundedBoxGeometry(
-            headSize, 
-            headSize, 
-            headSize, 
-            edgeRadius, 
-            edgeSegments
-        );
-        
-        // Assign Face Texture to correct side of geometry array
-        const headMaterials = [
-            skinMat, 
-            skinMat, 
-            skinMat, 
-            skinMat, 
-            faceMat, 
-            skinMat
-        ];
-        
-        const head = new THREE.Mesh(headGeo, headMaterials);
-        head.position.y = torsoH + (headSize / 2); 
-        head.castShadow = true;
-        avatarGroup.add(head);
-
-        // Build Torso Geometry
-        const torsoGeo = new THREE.RoundedBoxGeometry(
-            torsoW, 
-            torsoH, 
-            torsoD, 
-            edgeRadius, 
-            edgeSegments
-        );
-        
-        const torso = new THREE.Mesh(torsoGeo, shirtMat);
-        torso.position.y = torsoH / 2;
-        torso.castShadow = true;
-        avatarGroup.add(torso);
-
-        // Limb Creation Factory Function
-        function createLimb(material, x, y, z) {
-            
-            // Create hierarchical pivot group for joint animation
-            const pivot = new THREE.Group();
-            pivot.position.set(x, y, z);
-            
-            // Build Limb Geometry
-            const limbGeo = new THREE.RoundedBoxGeometry(
-                limbSize, 
-                limbLength, 
-                limbSize, 
-                edgeRadius, 
-                edgeSegments
-            );
-            
-            const mesh = new THREE.Mesh(limbGeo, material);
-            
-            // Offset mesh inside pivot to rotate from the shoulder/hip joint
-            mesh.position.y = -limbLength / 2; 
-            mesh.castShadow = true;
-            
-            // Assemble hierarchy
-            pivot.add(mesh);
-            avatarGroup.add(pivot);
-            
-            return pivot;
-        }
-
-        // Attach Limbs to Torso Pivot Points
-        const leftArmX = -(torsoW / 2 + limbSize / 2);
-        const rightArmX = (torsoW / 2 + limbSize / 2);
-        
-        const leftArm = createLimb(skinMat, leftArmX, torsoH, 0);
-        const rightArm = createLimb(skinMat, rightArmX, torsoH, 0);
-        
-        const leftLeg = createLimb(pantsMat, -0.25, 0, 0);
-        const rightLeg = createLimb(pantsMat, 0.25, 0, 0);
-
-        // Build Master Physics Hitbox
-        // Player Total Height calculation:
-        // Torso(1.0) + Head(0.6) + Legs(1.0) = 2.6 Total Height.
-        // Half Height required by CANNON.js Box is 1.3
-        
-        const playerHalfHeight = 1.3; 
-        const playerHalfWidth = 0.6;
-        const playerHalfDepth = 0.25;
-        
-        const playerShapeVec = new CANNON.Vec3(
-            playerHalfWidth, 
-            playerHalfHeight, 
-            playerHalfDepth
-        );
-        
-        const playerShape = new CANNON.Box(playerShapeVec);
-        
-        const playerBodyOptions = {
-            mass: 10,
-            shape: playerShape,
-            position: new CANNON.Vec3(0, playerHalfHeight, 0), 
-            linearDamping: 0.1, 
-            angularDamping: 1.0, 
-            material: playerMaterial
-        };
-        
-        const playerBody = new CANNON.Body(playerBodyOptions);
-        
-        // Enforce upright lock
-        playerBody.fixedRotation = true; 
-        
-        // Add Player Hitbox to simulation
-        world.addBody(playerBody);
-
-        /**
-         * ============================================================================
-         * 6. INPUT CAPTURE & EVENT LISTENERS
-         * ============================================================================
-         */
-        
-        // Camera Rotational Variables
-        let cameraYaw = 0;
-        let cameraPitch = 0.2; 
-        let isRightMouseDown = false;
-        
-        // Prevent Native Context Menu on Right Click
-        window.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // Mouse Down Event Tracker
-        window.addEventListener('mousedown', function(e) {
-            if (e.button === 2) {
-                isRightMouseDown = true;
-            }
-        });
-        
-        // Mouse Up Event Tracker
-        window.addEventListener('mouseup', function(e) {
-            if (e.button === 2) {
-                isRightMouseDown = false;
-            }
-        });
-        
-        // Mouse Move Orbit Control Logic
-        window.addEventListener('mousemove', function(e) {
-            if (isRightMouseDown === true) {
-                
-                // Adjust Yaw Based on Mouse X Velocity
-                cameraYaw = cameraYaw - (e.movementX * 0.005);
-                
-                // Adjust Pitch Based on Mouse Y Velocity
-                cameraPitch = cameraPitch - (e.movementY * 0.005);
-                
-                // Clamp Pitch to prevent camera flipping over
-                const minPitch = -Math.PI / 2 + 0.1;
-                const maxPitch = Math.PI / 2 - 0.1;
-                
-                if (cameraPitch < minPitch) {
-                    cameraPitch = minPitch;
-                }
-                if (cameraPitch > maxPitch) {
-                    cameraPitch = maxPitch;
-                }
-            }
-        });
-
-        // Keyboard State Mapping Object
-        const keys = { 
-            w: false, 
-            a: false, 
-            s: false, 
-            d: false, 
-            space: false 
-        };
-        
-        // Key Down Event Router
-        window.addEventListener('keydown', function(e) {
-            if (e.code === 'KeyW') {
-                keys.w = true;
-            }
-            if (e.code === 'KeyA') {
-                keys.a = true;
-            }
-            if (e.code === 'KeyS') {
-                keys.s = true;
-            }
-            if (e.code === 'KeyD') {
-                keys.d = true;
-            }
-            if (e.code === 'Space') {
-                keys.space = true;
-            }
-        });
-        
-        // Key Up Event Router
-        window.addEventListener('keyup', function(e) {
-            if (e.code === 'KeyW') {
-                keys.w = false;
-            }
-            if (e.code === 'KeyA') {
-                keys.a = false;
-            }
-            if (e.code === 'KeyS') {
-                keys.s = false;
-            }
-            if (e.code === 'KeyD') {
-                keys.d = false;
-            }
-            if (e.code === 'Space') {
-                keys.space = false;
-            }
-        });
-
-        /**
-         * ============================================================================
-         * 7. GAME LOOP & ANIMATION CONTROLLER
-         * ============================================================================
-         */
-        
-        // Initialize high resolution timing clock
-        const clock = new THREE.Clock();
-        
-        // Animation accumulator for sine waves
-        let walkTime = 0;
-
-        function animate() {
-            
-            // Queue Next Frame
-            requestAnimationFrame(animate);
-            
-            // Calculate Delta Time
-            const dt = clock.getDelta();
-            
-            // Step Physics Simulation
-            const fixedTimeStep = 1 / 60;
-            const maxSubSteps = 3;
-            world.step(fixedTimeStep, dt, maxSubSteps);
-
-            // Setup Movement Vectors
-            const moveSpeed = 16; 
-            let moveX = 0;
-            let moveZ = 0;
-
-            // Apply Input Directions
-            if (keys.w === true) {
-                moveZ = moveZ - 1;
-            }
-            if (keys.s === true) {
-                moveZ = moveZ + 1;
-            }
-            if (keys.a === true) {
-                moveX = moveX - 1;
-            }
-            if (keys.d === true) {
-                moveX = moveX + 1;
-            }
-
-            // Normalize Diagonal Movement Speed
-            const lengthSquared = (moveX * moveX) + (moveZ * moveZ);
-            const length = Math.sqrt(lengthSquared);
-            
-            if (length > 0) {
-                moveX = moveX / length;
-                moveZ = moveZ / length;
-            }
-
-            // Transform Movement via Camera Perspective
-            const angle = cameraYaw;
-            
-            const cosAngle = Math.cos(angle);
-            const sinAngle = Math.sin(angle);
-            
-            const projectedX = (moveX * cosAngle) + (moveZ * sinAngle);
-            const projectedZ = (-moveX * sinAngle) + (moveZ * cosAngle);
-            
-            const targetVelocityX = projectedX * moveSpeed;
-            const targetVelocityZ = projectedZ * moveSpeed;
-
-            // Apply calculated velocity directly to simulation body
-            playerBody.velocity.x = targetVelocityX;
-            playerBody.velocity.z = targetVelocityZ;
-
-            // Highly accurate Ground Collision Check
-            const groundedThreshold = playerHalfHeight + 0.1;
-            let isGrounded = false;
-            
-            if (playerBody.position.y <= groundedThreshold) {
-                isGrounded = true;
-            }
-            
-            // Process Jump Logic
-            if (keys.space === true) {
-                if (isGrounded === true) {
-                    // Apply immediate upward impulse
-                    const jumpStrength = 35;
-                    playerBody.velocity.set(0, jumpStrength, 0);
-                }
-            }
-
-            // Sync Rendering Engine to Physics Engine Position
-            // The visual group base is at y=-1 (hips=0). 
-            // The physics center is exactly 0.3 units above the visual hip level.
-            const physicsVisualOffset = 0.3;
-            
-            avatarGroup.position.x = playerBody.position.x;
-            avatarGroup.position.y = playerBody.position.y - physicsVisualOffset; 
-            avatarGroup.position.z = playerBody.position.z;
-
-            // Procedurally Rotate Avatar to face movement vector
-            let isMoving = false;
-            if (length > 0) {
-                isMoving = true;
-                
-                const velX = playerBody.velocity.x;
-                const velZ = playerBody.velocity.z;
-                
-                const targetRotation = Math.atan2(velX, velZ);
-                avatarGroup.rotation.y = targetRotation;
-            }
-
-            // Compute Avatar Skeletal Animations
-            if (isGrounded === false) {
-                
-                // Falling / Jumping Pose Configuration
-                leftArm.rotation.x = 2.5; 
-                rightArm.rotation.x = 2.5;
-                leftLeg.rotation.x = -0.2;
-                rightLeg.rotation.x = 0.2;
-                
-            } else {
-                
-                if (isMoving === true) {
-                    
-                    // Walking Oscillation Animation
-                    const animationSpeedModifier = 8;
-                    walkTime = walkTime + (dt * animationSpeedModifier);
-                    
-                    const swingAmplitude = 1.2;
-                    const swing = Math.sin(walkTime) * swingAmplitude;
-                    
-                    leftArm.rotation.x = swing;
-                    rightArm.rotation.x = -swing;
-                    leftLeg.rotation.x = -swing;
-                    rightLeg.rotation.x = swing;
-                    
-                } else {
-                    
-                    // Reset to Resting Idle Pose
-                    walkTime = 0;
-                    
-                    leftArm.rotation.x = 0;
-                    rightArm.rotation.x = 0;
-                    leftLeg.rotation.x = 0;
-                    rightLeg.rotation.x = 0;
-                    
-                }
-            }
-
-            // Calculate Dynamic Camera Orbital Position
-            const camDistance = 8; 
-            
-            const camOffsetX = camDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
-            const camOffsetY = camDistance * Math.sin(cameraPitch);
-            const camOffsetZ = camDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
-            
-            const camOffset = new THREE.Vector3(camOffsetX, camOffsetY, camOffsetZ);
-            
-            // Set Camera Focal Target (Slightly above head)
-            const focalTargetY = avatarGroup.position.y + physicsVisualOffset + 1.0;
-            const lookTarget = new THREE.Vector3(
-                avatarGroup.position.x, 
-                focalTargetY, 
-                avatarGroup.position.z
-            );
-            
-            // Apply Camera Translation and Rotation
-            camera.position.copy(lookTarget).add(camOffset);
-            camera.lookAt(lookTarget);
-
-            // Final Render Pass Dispatch
-            renderer.render(scene, camera);
-        }
-
-        // Boot Animation Engine
-        animate();
-
-        // Bind Resize Event Handler to Window Context
-        window.addEventListener('resize', function() {
-            
-            // Recalculate aspect ratio on resize
-            const newAspectRatio = window.innerWidth / window.innerHeight;
-            camera.aspect = newAspectRatio;
-            
-            // Force perspective matrix update
-            camera.updateProjectionMatrix();
-            
-            // Scale WebGL context dimensions
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            
-        });
-    </script>
+    <!-- ENGINE SCRIPT -->
+    <script type="module" src="game.js"></script>
 </body>
 </html>

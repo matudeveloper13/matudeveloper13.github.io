@@ -3,182 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JUST superblocks - Complete Engine</title>
+    <title>Superblocks - Classic Edition</title>
     <style>
-        /* ==========================================
-           SIMPLE, CLEAN, RETRO UI STYLING
-           ========================================== */
-        * {
-            box-sizing: border-box;
-        }
-
-        body, html {
+        body {
             margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
             overflow: hidden;
-            background-color: #111111;
-            color: #ffffff;
+            background-color: #111;
+            color: #fff;
             font-family: Arial, sans-serif;
             user-select: none;
         }
-
-        canvas {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-
-        /* MAIN MENU CONTAINER */
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         #main-menu {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #222222;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #222; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 1000;
         }
-
         .menu-box {
-            background-color: #333333;
-            padding: 40px;
-            border: 3px solid #555555;
-            text-align: center;
-            width: 380px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            background-color: #333; padding: 30px; border: 2px solid #555; text-align: center; width: 350px;
         }
-
-        h1 {
-            margin: 0 0 25px 0;
-            font-size: 32px;
-            color: #ffffff;
-            letter-spacing: 2px;
-        }
-
+        h1 { margin: 0 0 20px 0; font-size: 32px; color: #fff; }
         input {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-            font-family: Arial, sans-serif;
-            margin-bottom: 15px;
-            border: 2px solid #000000;
-            background: #ffffff;
-            color: #000000;
-            outline: none;
+            width: 90%; padding: 10px; font-size: 16px; margin-bottom: 10px;
+            border: 2px solid #000; background: #fff; color: #000; outline: none;
         }
-
-        input:focus {
-            border-color: #ff9900;
-        }
-
         .btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            font-family: Arial, sans-serif;
-            margin-bottom: 12px;
-            border: 2px solid #000000;
-            cursor: pointer;
-            color: #000000;
-            transition: background-color 0.2s, transform 0.1s;
+            display: block; width: 100%; padding: 15px; font-size: 16px; font-weight: bold;
+            margin-bottom: 10px; border: 2px solid #000; cursor: pointer; color: #000; background-color: #ff9900;
         }
-
-        .btn:hover {
-            background-color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        #btn-obby { background-color: #ff9900; }
-        #btn-void { background-color: #9900ff; color: #ffffff; }
-        #btn-lava { background-color: #cc0000; color: #ffffff; }
-
-        #error-msg {
-            color: #ff5555;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            min-height: 20px;
-        }
-
-        /* IN-GAME HUD */
+        .btn:hover { background-color: #fff; }
+        #error-msg { color: #ff5555; font-weight: bold; margin-bottom: 15px; min-height: 20px; }
         #hud {
-            display: none;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-            pointer-events: none;
+            display: none; position: absolute; top: 15px; left: 15px; z-index: 10;
         }
-
-        .interactive-hud {
-            pointer-events: auto;
-        }
-
         #btn-quit {
-            background-color: #cc0000;
-            color: white;
-            border: 2px solid #000000;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 15px;
-            font-family: Arial, sans-serif;
+            background-color: #ff3333; color: white; border: 2px solid #000;
+            padding: 10px 20px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;
         }
-
-        #btn-quit:hover {
-            background-color: #ff3333;
-        }
-
+        #btn-quit:hover { background-color: #ff5555; }
         .stats {
-            background-color: rgba(0, 0, 0, 0.75);
-            padding: 15px;
-            border: 2px solid #555555;
-            font-size: 14px;
-            line-height: 1.6;
-            width: 220px;
+            background-color: #000; padding: 15px; border: 2px solid #555; font-size: 14px; line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <!-- MAIN MENU SCREEN -->
     <div id="main-menu">
         <div class="menu-box">
             <h1>SUPERBLOCKS</h1>
             <input type="text" id="playerName" placeholder="Enter Username..." maxlength="12" autocomplete="off">
             <div id="error-msg"></div>
-            <button class="btn" id="btn-obby">Play Obby</button>
-            <button class="btn" id="btn-void">Play Dark Void</button>
-            <button class="btn" id="btn-lava">Play Lava Survival</button>
+            <button class="btn" id="btn-obby">Play Obby Course</button>
         </div>
     </div>
 
-    <!-- IN-GAME HUD SCREEN -->
-    <div id="hud" class="interactive-hud">
+    <div id="hud">
         <button id="btn-quit">QUIT TO MENU</button>
         <div class="stats">
             <div id="stat-fps">FPS: 0</div>
-            <div id="stat-mode">Mode: None</div>
             <div id="stat-pos">Pos: 0, 0, 0</div>
         </div>
     </div>
 
-    <!-- MAIN ENGINE SCRIPT -->
-    <script type="module" src="game.js"></script>
+    <!-- Load Three.js via Global CDN (Bypasses CORS module issues) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- CHARACTER & AVATAR BUILDER ---
+        function createAvatar(colorHex, name) {
+            const root = new THREE.Group();
+            const mat = new THREE.MeshLambertMaterial({ color: colorHex });
+
+            // Torso (Blocky Roblox style)
+            const torsoGeo = new THREE.BoxGeometry(0.9, 1.1, 0.5);
+            const torso = new THREE.Mesh(torsoGeo, mat);
+            torso.position.y = 1.1;
+            root.add(torso);
+
+            // Head with Face
+            const headGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+            const head = new THREE.Mesh(headGeo, mat);
+            head.position.y = 0.95;
+
+            // Generate Face Canvas Texture
+            const faceCanvas = document.createElement('canvas');
+            faceCanvas.width = 64; faceCanvas.height = 64;
+            const ctx = faceCanvas.getContext('2d');
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(14, 18, 9, 9);  // Left Eye
+            ctx.fillRect(41, 18, 9, 9);  // Right Eye
+            ctx.fillRect(20, 44, 24, 6); // Mouth
+            
+            const faceMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(faceCanvas) });
+            const facePlane = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5), faceMat);
+            facePlane.position.set(0, 0, 0.36);
+            head.add(facePlane);
+            torso.add(head);
+
+            // Limbs Pivots
+            const laPivot = new THREE.Group(); laPivot.position.set(-0.6, 0.4, 0); torso.add(laPivot);
+            const raPivot = new THREE.Group(); raPivot.position.set(0.6, 0.4, 0); torso.add(raPivot);
+            const llPivot = new THREE.Group(); llPivot.position.set(-0.25, -0.55, 0); torso.add(llPivot);
+            const rlPivot = new THREE.Group(); rlPivot.position.set(0.25, -0.55, 0); torso.add(rlPivot);
+
+            const armGeo = new THREE.BoxGeometry(0.28, 0.85, 0.28);
+            const legGeo = new THREE.BoxGeometry(0.32, 0.95, 0.32);
+
+            const armMesh1 = new THREE.Mesh(armGeo, mat); armMesh1.position.y = -0.35; laPivot.add(armMesh1);
+            const armMesh2 = new THREE.Mesh(armGeo, mat); armMesh2.position.y = -0.35; raPivot.add(armMesh2);
+            const legMesh1 = new THREE.Mesh(legGeo, mat); legMesh1.position.y = -0.4; llPivot.add(legMesh1);
+            const legMesh2 = new THREE.Mesh(legGeo, mat); legMesh2.position.y = -0.4; rlPivot.add(legMesh2);
+
+            // Nametag Sprite
+            const tagCanvas = document.createElement('canvas');
+            tagCanvas.width = 256; tagCanvas.height = 64;
+            const tCtx = tagCanvas.getContext('2d');
+            tCtx.font = 'bold 34px Arial'; tCtx.fillStyle = '#ffffff'; tCtx.textAlign = 'center';
+            tCtx.lineWidth = 4; tCtx.strokeStyle = '#000000';
+            tCtx.strokeText(name, 128, 40); tCtx.fillText(name, 128, 40);
+            const nameTag = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(tagCanvas) }));
+            nameTag.scale.set(3, 0.75, 1);
+            nameTag.position.y = 2.6;
+            root.add(nameTag);
+
+            return { root, torso, la: laPivot, ra: raPivot, ll: llPivot, rl: rlPivot, walkTimer: 0 };
+        }
+
+        function animateAvatar(avatar, velocity, isGrounded, dt) {
+            const speed = Math.sqrt(velocity.x**2 + velocity.z**2);
+            if (!isGrounded) {
+                avatar.la.rotation.x = -1.2; avatar.ra.rotation.x = -1.2;
+                avatar.ll.rotation.x = -0.4; avatar.rl.rotation.x = 0.4;
+            } else if (speed > 0.01) {
+                avatar.walkTimer += speed * dt * 70;
+                const swing = Math.sin(avatar.walkTimer) * 1.0;
+                avatar.la.rotation.x = swing; avatar.ra.rotation.x = -swing;
+                avatar.ll.rotation.x = -swing; avatar.rl.rotation.x = swing;
+            } else {
+                avatar.walkTimer = 0;
+                avatar.la.rotation.x *= 0.8; avatar.ra.rotation.x *= 0.8;
+                avatar.ll.rotation.x *= 0.8; avatar.rl.rotation.x *= 0.8;
+            }
+            avatar.torso.rotation.z = -velocity.x * 2.0;
+            avatar.torso.rotation.x = velocity.z * 2.0;
+        }
+
+        // --- GAME ENGINE SETUP ---
+        let scene, camera, renderer, player, blocks = [];
+        let keys = { w: false, a: false, s: false, d: false, space: false };
+        let clock = new THREE.Clock();
+        let isPlaying = false;
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            const light = new THREE.DirectionalLight(0xffffff, 1.2);
+            light.position.set(20, 50, 20);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+
+            // Controls
+            window.addEventListener('keydown', (e) => handleKey(e, true));
+            window.addEventListener('keyup', (e) => handleKey(e, false));
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            document.getElementById('btn-obby').addEventListener('click', startGame);
+            document.getElementById('btn-quit').addEventListener('click', quitGame);
+
+            loop();
+        }
+
+        function handleKey(e, isDown) {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || k === 'arrowup') keys.w = isDown;
+            if (k === 'a' || k === 'arrowleft') keys.a = isDown;
+            if (k === 's' || k === 'arrowdown') keys.s = isDown;
+            if (k === 'd' || k === 'arrowright') keys.d = isDown;
+            if (k === ' ') keys.space = isDown;
+        }
+
+        function addBlock(x, y, z, w, h, d, color) {
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({ color }));
+            mesh.position.set(x, y, z);
+            scene.add(mesh);
+            mesh.updateMatrixWorld();
+            blocks.push({ mesh, box: new THREE.Box3().setFromObject(mesh) });
+        }
+
+        function buildObby() {
+            addBlock(0, 0, 0, 10, 1, 10, 0x44aa44); // Start
+            for (let i = 1; i < 25; i++) {
+                addBlock(0, i * 0.4, -i * 4.5, 3, 0.5, 3, 0xff9900);
+            }
+        }
+
+        function startGame() {
+            const name = document.getElementById('playerName').value.trim();
+            if (name.length < 3) {
+                document.getElementById('error-msg').innerText = "Name needs 3+ characters!";
+                return;
+            }
+
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('hud').style.display = 'block';
+
+            buildObby();
+
+            player = {
+                avatar: createAvatar(0x00aaff, name),
+                pos: new THREE.Vector3(0, 4, 0),
+                vel: new THREE.Vector3(0, 0, 0),
+                grounded: false
+            };
+            scene.add(player.avatar.root);
+            isPlaying = true;
+        }
+
+        function quitGame() {
+            isPlaying = false;
+            if (player) {
+                scene.remove(player.avatar.root);
+                player = null;
+            }
+            blocks.forEach(b => scene.remove(b.mesh));
+            blocks = [];
+            document.getElementById('hud').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        function loop() {
+            requestAnimationFrame(loop);
+            const dt = clock.getDelta();
+
+            if (isPlaying && player) {
+                const speed = 0.07;
+                let ix = 0, iz = 0;
+                if (keys.w) iz -= 1;
+                if (keys.s) iz += 1;
+                if (keys.a) ix -= 1;
+                if (keys.d) ix += 1;
+                if (ix !== 0 && iz !== 0) { ix *= 0.707; iz *= 0.707; }
+
+                player.vel.x += ix * speed;
+                player.vel.z += iz * speed;
+                player.vel.x *= 0.8;
+                player.vel.z *= 0.8;
+                player.vel.y -= 0.025; // Gravity
+
+                if (keys.space && player.grounded) {
+                    player.vel.y = 0.38;
+                    player.grounded = false;
+                }
+
+                // Simple Box Collisions
+                const pBox = new THREE.Box3();
+                pBox.min.set(player.pos.x - 0.4, player.pos.y, player.pos.z - 0.4);
+                pBox.max.set(player.pos.x + 0.4, player.pos.y + 2.0, player.pos.z + 0.4);
+
+                player.grounded = false;
+
+                // Y Collision
+                const testY = pBox.clone().translate(new THREE.Vector3(0, player.vel.y, 0));
+                for (let b of blocks) {
+                    if (testY.intersectsBox(b.box)) {
+                        if (player.vel.y < 0) { player.vel.y = (b.box.max.y - pBox.min.y) + 0.001; player.grounded = true; }
+                        else if (player.vel.y > 0) { player.vel.y = (b.box.min.y - pBox.max.y) - 0.001; }
+                        break;
+                    }
+                }
+                pBox.translate(new THREE.Vector3(0, player.vel.y, 0));
+
+                // X/Z Collisions
+                pBox.translate(new THREE.Vector3(player.vel.x, 0, 0));
+                pBox.translate(new THREE.Vector3(0, 0, player.vel.z));
+
+                player.pos.add(player.vel);
+
+                if (player.pos.y < -20) {
+                    player.pos.set(0, 5, 0);
+                    player.vel.set(0, 0, 0);
+                }
+
+                player.avatar.root.position.copy(player.pos);
+                animateAvatar(player.avatar, player.vel, player.grounded, dt);
+
+                // Camera follow
+                camera.position.lerp(new THREE.Vector3(player.pos.x, player.pos.y + 4, player.pos.z + 10), 0.2);
+                camera.lookAt(player.pos.x, player.pos.y + 1, player.pos.z);
+
+                document.getElementById('stat-pos').innerText = `Pos: ${player.pos.x.toFixed(1)}, ${player.pos.y.toFixed(1)}, ${player.pos.z.toFixed(1)}`;
+                document.getElementById('stat-fps').innerText = `FPS: ${Math.round(1/dt)}`;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = init;
+    </script>
 </body>
 </html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="game.js"></script>
